@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: #f6f1e7;
+  color: #1c1915;
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", sans-serif;
+}
+
+body:has(.family-wallpaper) {
+  background: #f3f6f4;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #e07a5f;
+  outline-offset: 2px;
+}
+
+.cat-mouth-open {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cat-talk 0.28s ease-in-out infinite;
+}
+
+@keyframes cat-talk {
+  0%,
+  100% {
+    transform: scaleY(0.28);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}

@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Household {
+  id                   String    @id @default(cuid())
+  createdAt            DateTime  @default(now())
+  pairingCodeHash      String?
+  pairingCodeExpiresAt DateTime?
+  devicePinHash        String?
+  deviceGeneration     Int       @default(0)
+  pinFailedAttempts    Int       @default(0)
+  pinLockedUntil       DateTime?
+  quakeDrillUntil      DateTime?
+  lastQuakeAck         String?
+  members              Member[]
+  elder                ElderProfile?
+  contacts             Contact[]
+  alerts               Alert[]
+  exerciseProgress     ExerciseProgress[]
+  mealDays             MealDay[]
+}
+
+model Member {
+  id           String    @id @default(cuid())
+  householdId  String
+  household    Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name         String
+  email        String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+}
+
+model ElderProfile {
+  id                String    @id @default(cuid())
+  householdId       String    @unique
+  household         Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  displayName       String
+  honorific         String    @default("さん")
+  age               Int
+  prefectureCode    String
+  prefectureName    String
+  city              String
+  fallRisk          Boolean   @default(false)
+  shelterName       String
+  shelterAddressEnc String    @default("")
+  kitLocationEnc    String    @default("")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Contact {
+  id          String    @id @default(cuid())
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  name        String
+  phone       String
+  sortOrder   Int
+}
+
+model ExerciseProgress {
+  id          String    @id @default(cuid())
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  kind        String
+  dateKey     String
+  completed   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([householdId, kind, dateKey])
+}
+
+model MealDay {
+  id          String    @id @default(cuid())
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  dateKey     String
+  breakfast   Boolean   @default(false)
+  lunch       Boolean   @default(false)
+  dinner      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([householdId, dateKey])
+}
+
+model Alert {
+  id          String    @id @default(cuid())
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  type        String
+  title       String
+  body        String
+  read        Boolean   @default(false)
+  dedupeKey   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([householdId, createdAt])
+  @@index([householdId, dedupeKey])
+}
+
