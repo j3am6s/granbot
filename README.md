@@ -1,3 +1,3 @@
 # Granbot
 
-details and report in grandbot.pdf
+details and report in granbot.pdf
